@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerUser } from "@/lib/auth";
 import Link from "next/link";
 
 const schema = z.object({
@@ -16,21 +14,13 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function CadastroPage() {
-  const [error, setError] = useState("");
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: FormData) => {
-    try {
-      setError("");
-      const user = await registerUser(data.email, data.password, data.name);
-      const token = await user.getIdToken();
-      document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`;
-      window.location.href = "/checkout";
-    } catch (err: any) {
-      setError(err.message || "Erro ao criar conta.");
-    }
+    console.log("Cadastro:", data);
+    window.location.href = "/checkout";
   };
 
   return (

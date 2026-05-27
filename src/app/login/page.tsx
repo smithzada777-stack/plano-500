@@ -1,10 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginUser } from "@/lib/auth";
 import Link from "next/link";
 
 const schema = z.object({
@@ -15,21 +13,13 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function LoginPage() {
-  const [error, setError] = useState("");
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: FormData) => {
-    try {
-      setError("");
-      const user = await loginUser(data.email, data.password);
-      const token = await user.getIdToken();
-      document.cookie = `auth-token=${token}; path=/; max-age=${60 * 60 * 24 * 7}`;
-      window.location.href = "/membros";
-    } catch (err: any) {
-      setError("Email ou senha inválidos.");
-    }
+    console.log("Login:", data);
+    alert("Login em desenvolvimento. Em breve!");
   };
 
   return (
