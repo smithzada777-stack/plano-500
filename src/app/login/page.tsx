@@ -1,62 +1,60 @@
 "use client";
 
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-
-const schema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "Mínimo 6 caracteres"),
-});
-
-type FormData = z.infer<typeof schema>;
+import { loginWithToken } from "@/lib/auth";
+import { KeyRound } from "lucide-react";
 
 export default function LoginPage() {
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  });
+  const router = useRouter();
+  const [token, setToken] = useState("");
+  const [error, setError] = useState("");
 
-  const onSubmit = async (data: FormData) => {
-    console.log("Login:", data);
-    alert("Login em desenvolvimento. Em breve!");
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    const user = loginWithToken(token.trim().toUpperCase());
+    if (!user) {
+      setError("Token inválido, expirado ou conta bloqueada.");
+      return;
+    }
+    router.push("/acesso");
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6">
-      <div className="w-full max-w-md bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-        <h2 className="text-2xl font-bold mb-6 text-center">Entrar na Conta</h2>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm mb-1">Email</label>
-            <input
-              type="email"
-              {...register("email")}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-400 outline-none"
-            />
-            {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>}
+    <main className="min-h-screen flex items-center justify-center px-5">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-6">
+          <div className="w-14 h-14 rounded-2xl bg-green-600 flex items-center justify-center mx-auto mb-4">
+            <KeyRound className="w-7 h-7 text-black" />
           </div>
+          <h1 className="text-2xl font-black">Acessar Plano 500</h1>
+          <p className="text-sm text-neutral-400 mt-1">Cole seu token de acesso recebido após a compra.</p>
+        </div>
+
+        <form onSubmit={handleLogin} className="card space-y-4">
           <div>
-            <label className="block text-sm mb-1">Senha</label>
+            <label className="block text-xs text-neutral-400 mb-1.5">Token de acesso</label>
             <input
-              type="password"
-              {...register("password")}
-              className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-cyan-400 outline-none"
+              value={token}
+              onChange={(e) => setToken(e.target.value)}
+              placeholder="Ex: AB12CD34EF56GH78"
+              className="input font-mono uppercase"
+              autoFocus
             />
-            {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>}
           </div>
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 font-bold hover:scale-[1.02] transition disabled:opacity-50"
-          >
-            {isSubmitting ? "Entrando..." : "Entrar"}
+
+          {error && <p className="text-red-400 text-sm">{error}</p>}
+
+          <button type="submit" className="btn-primary">
+            Entrar
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-gray-400">
-          Não tem conta?{" "}
-          <Link href="/cadastro" className="text-cyan-400 hover:underline">
-            Criar conta
+
+        <p className="mt-5 text-center text-sm text-neutral-400">
+          Ainda não comprou?{" "}
+          <Link href="/checkout" className="text-amber-400 font-semibold">
+            Adquirir acesso
           </Link>
         </p>
       </div>
