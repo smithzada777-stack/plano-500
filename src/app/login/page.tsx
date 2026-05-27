@@ -55,7 +55,6 @@ export default function LoginPage() {
             />
             {errors.password && <p className="text-red-400 text-sm mt-1">{errors.password.message}</p>}
           </div>
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
           <button
             type="submit"
             disabled={isSubmitting}
